@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Strategy Game</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; text-align: center; }
+    .game-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .stats, .actions { margin: 20px 0; padding: 10px; background: #222; border: 1px solid #444; }
+    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Mini Strategy Game</h1>
+
+    <div class="stats">
+      <h2>Resources</h2>
+      <p>Gold: <span id="gold">100</span></p>
+      <p>Troops: <span id="troops">10</span></p>
+      <p>Enemy Strength: <span id="enemy">50</span></p>
+    </div>
+
+    <div class="actions">
+      <h2>Actions</h2>
+      <button onclick="trainTroops()">Train Troops (-10 gold)</button>
+      <button onclick="attackEnemy()">Attack Enemy</button>
+      <button onclick="collectGold()">Collect Gold (+20 gold)</button>
+    </div>
+
+    <div id="log"></div>
+  </div>
+
+  <script>
+    let gold = 100;
+    let troops = 10;
+    let enemy = 50;
+
+    const goldEl = document.getElementById('gold');
+    const troopsEl = document.getElementById('troops');
+    const enemyEl = document.getElementById('enemy');
+    const logEl = document.getElementById('log');
+
+    function updateStats() {
+      goldEl.textContent = gold;
+      troopsEl.textContent = troops;
+      enemyEl.textContent = enemy;
+    }
+
+    function log(message) {
+      const entry = document.createElement('p');
+      entry.textContent = message;
+      logEl.prepend(entry);
+    }
+
+    function trainTroops() {
+      if (gold >= 10) {
+        gold -= 10;
+        troops += 5;
+        log("You trained 5 new troops.");
+      } else {
+        log("Not enough gold to train troops!");
+      }
+      updateStats();
+    }
+
+    function attackEnemy() {
+      if (troops >= 10) {
+        const damage = Math.floor(Math.random() * troops);
+        enemy -= damage;
+        troops -= Math.floor(damage / 2);
+        if (enemy <= 0) {
+          enemy = 0;
+          log("You defeated the enemy!");
+        } else {
+          log(`You attacked the enemy and dealt ${damage} damage.`);
+        }
+      } else {
+        log("Not enough troops to attack!");
+      }
+      updateStats();
+    }
+
+    function collectGold() {
+      const amount = 20 + Math.floor(Math.random() * 10);
+      gold += amount;
+      log(`You collected ${amount} gold.`);
+      updateStats();
+    }
+
+    updateStats();
+  </script>
+</body>
+</html>
