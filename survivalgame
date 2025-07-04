@@ -1,95 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Strategy Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini RPG with Crafting</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #fff; text-align: center; }
-    .game-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .stats, .actions { margin: 20px 0; padding: 10px; background: #222; border: 1px solid #444; }
-    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+    body { font-family: sans-serif; background: #222; color: #fff; text-align: center; }
+    .inventory, .crafting { margin: 20px auto; max-width: 400px; padding: 10px; border: 1px solid #555; background: #333; }
+    button { padding: 5px 10px; margin: 5px; cursor: pointer; }
+    .item { display: flex; justify-content: space-between; margin: 5px 0; }
   </style>
 </head>
 <body>
-  <div class="game-container">
-    <h1>Mini Strategy Game</h1>
+  <h1>Mini RPG with Crafting</h1>
 
-    <div class="stats">
-      <h2>Resources</h2>
-      <p>Gold: <span id="gold">100</span></p>
-      <p>Troops: <span id="troops">10</span></p>
-      <p>Enemy Strength: <span id="enemy">50</span></p>
-    </div>
+  <div class="inventory">
+    <h2>Inventory</h2>
+    <div id="inventoryList"></div>
+    <button onclick="gatherItem('wood')">Gather Wood</button>
+    <button onclick="gatherItem('stone')">Gather Stone</button>
+  </div>
 
-    <div class="actions">
-      <h2>Actions</h2>
-      <button onclick="trainTroops()">Train Troops (-10 gold)</button>
-      <button onclick="attackEnemy()">Attack Enemy</button>
-      <button onclick="collectGold()">Collect Gold (+20 gold)</button>
-    </div>
-
-    <div id="log"></div>
+  <div class="crafting">
+    <h2>Crafting</h2>
+    <button onclick="craftItem('axe')">Craft Axe (2 Wood, 1 Stone)</button>
+    <button onclick="craftItem('sword')">Craft Sword (1 Wood, 2 Stone)</button>
+    <button onclick="craftItem('steel')">Craft Steel (3 Stone)</button>
+    <button onclick="craftItem('mace')">Craft Mace (2 Wood, 3 Stone)</button>
+    <div id="craftedList"></div>
   </div>
 
   <script>
-    let gold = 100;
-    let troops = 10;
-    let enemy = 50;
+    const inventory = {
+      wood: 0,
+      stone: 0
+    };
 
-    const goldEl = document.getElementById('gold');
-    const troopsEl = document.getElementById('troops');
-    const enemyEl = document.getElementById('enemy');
-    const logEl = document.getElementById('log');
+    const crafted = [];
 
-    function updateStats() {
-      goldEl.textContent = gold;
-      troopsEl.textContent = troops;
-      enemyEl.textContent = enemy;
+    function updateInventory() {
+      const list = document.getElementById("inventoryList");
+      list.innerHTML = `
+        <div class="item">Wood: ${inventory.wood}</div>
+        <div class="item">Stone: ${inventory.stone}</div>
+      `;
     }
 
-    function log(message) {
-      const entry = document.createElement('p');
-      entry.textContent = message;
-      logEl.prepend(entry);
+    function updateCrafted() {
+      const list = document.getElementById("craftedList");
+      list.innerHTML = crafted.map(item => `<div class="item">${item}</div>`).join("");
     }
 
-    function trainTroops() {
-      if (gold >= 10) {
-        gold -= 10;
-        troops += 5;
-        log("You trained 5 new troops.");
+    function gatherItem(type) {
+      inventory[type]++;
+      updateInventory();
+    }
+
+    function craftItem(item) {
+      if (item === 'axe' && inventory.wood >= 2 && inventory.stone >= 1) {
+        inventory.wood -= 2;
+        inventory.stone -= 1;
+        crafted.push('Axe');
+      } else if (item === 'sword' && inventory.wood >= 1 && inventory.stone >= 2) {
+        inventory.wood -= 1;
+        inventory.stone -= 2;
+        crafted.push('Sword');
+      } else if (item === 'steel' && inventory.stone >= 3) {
+        inventory.stone -= 3;
+        crafted.push('Steel');
+      } else if (item === 'mace' && inventory.wood >= 2 && inventory.stone >= 3) {
+        inventory.wood -= 2;
+        inventory.stone -= 3;
+        crafted.push('Mace');
       } else {
-        log("Not enough gold to train troops!");
+        alert('Not enough resources!');
       }
-      updateStats();
+      updateInventory();
+      updateCrafted();
     }
 
-    function attackEnemy() {
-      if (troops >= 10) {
-        const damage = Math.floor(Math.random() * troops);
-        enemy -= damage;
-        troops -= Math.floor(damage / 2);
-        if (enemy <= 0) {
-          enemy = 0;
-          log("You defeated the enemy!");
-        } else {
-          log(`You attacked the enemy and dealt ${damage} damage.`);
-        }
-      } else {
-        log("Not enough troops to attack!");
-      }
-      updateStats();
-    }
-
-    function collectGold() {
-      const amount = 20 + Math.floor(Math.random() * 10);
-      gold += amount;
-      log(`You collected ${amount} gold.`);
-      updateStats();
-    }
-
-    updateStats();
+    // Initialize UI
+    updateInventory();
+    updateCrafted();
   </script>
 </body>
 </html>
